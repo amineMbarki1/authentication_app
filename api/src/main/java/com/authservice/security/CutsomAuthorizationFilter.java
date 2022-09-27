@@ -15,6 +15,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class CutsomAuthorizationFilter extends OncePerRequestFilter {
     private final JwtUtils jwtUtils;
@@ -25,7 +27,12 @@ public class CutsomAuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String access_token = jwtUtils.extractToken(request);
-        if (access_token == null || request.getServletPath().equals("/api/refresh_token")) {
+
+        Set<String> WHITE_LIST = new HashSet<>();
+        WHITE_LIST.add("/api/refresh_token"); WHITE_LIST.add("/api/register");
+        WHITE_LIST.add("/refresh_token");WHITE_LIST.add("/register");
+
+        if (access_token == null || WHITE_LIST.contains(request.getServletPath())) {
             filterChain.doFilter(request, response);
             return;
         }

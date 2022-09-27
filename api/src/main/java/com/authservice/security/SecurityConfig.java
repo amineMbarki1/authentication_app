@@ -24,7 +24,8 @@ public class SecurityConfig {
             "/login/**",
             "/register/**",
             "/api",
-            "/api/refresh_token"
+            "/api/refresh_token",
+            "/refresh_token"
     };
     private final AuthenticationConfiguration authenticationConfiguration;
 

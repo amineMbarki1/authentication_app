@@ -1,5 +1,6 @@
 package com.authservice.service;
 
+import com.authservice.dto.RegistrationRequest;
 import com.authservice.model.ApplicationUser;
 import com.authservice.repository.ApplicationUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,5 +29,10 @@ public class ApplicationUserService {
         return user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName().getRole()))
                 .collect(Collectors.toSet());
+    }
+
+    public ApplicationUser registerUser(RegistrationRequest registrationRequest) {
+
+        return null;
     }
 }

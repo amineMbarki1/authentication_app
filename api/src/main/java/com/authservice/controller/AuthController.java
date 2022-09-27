@@ -1,22 +1,23 @@
 package com.authservice.controller;
 
+import com.authservice.dto.RegistrationRequest;
 import com.authservice.model.ApplicationUser;
 import com.authservice.service.ApplicationUserService;
 import com.authservice.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("api")
 public class AuthController {
     private final JwtUtils jwtUtils;
     private final ApplicationUserService applicationUserService;
@@ -54,18 +55,12 @@ public class AuthController {
         }
     }
 
-    @GetMapping
-    public String test_public() {
-        return "This resource is public";
+    @PostMapping("/register")
+    public RegistrationRequest registerUser(@RequestBody @Valid RegistrationRequest registrationRequest) {
+        return registrationRequest;
+        // return new ResponseEntity<>(applicationUserService.registerUser(registrationRequest), HttpStatus.CREATED);
+
     }
 
-    @GetMapping("/user/test")
-    public String test() {
-        return "hey this rout is accessible by user or route";
-    }
 
-    @GetMapping("/admin/test")
-    public String test_admin() {
-        return "Hey this rout only accessible by admin";
-    }
 }
