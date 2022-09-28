@@ -1,10 +1,12 @@
 import React from 'react';
+import Login from './auth/components/Login';
 
 
 function App() {
   return (
     <div className="App">
-      <h1>hello </h1>
+      <br />
+      <Login />
     </div>
   );
 }
