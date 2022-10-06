@@ -22,12 +22,12 @@ const Register: FC = () => {
 
   const onSubmit = async (data: RegisterRequest) => {
     try {
+      console.log(data);
+
       setLoading(true);
       // console.log(data);
-      const response = await authService.register(data);
-      console.log(response);
-
-      toast.success("Your account has been registered 😉");
+      await authService.register(data);
+      toast.success("Your account has been Created😉 You can login now!");
     } catch (error) {
       console.error("hi this is my error", error);
       setError(error);
@@ -74,7 +74,7 @@ const Register: FC = () => {
         <input
           {...register("passwordMatch")}
           type="password"
-          id="matchPassword"
+          id="passwordMatch"
         />
         {errors.passwordMatch && <small>{errors.passwordMatch.message}</small>}
         <br />

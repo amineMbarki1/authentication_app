@@ -1,16 +1,20 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import { ZodError } from "zod";
 
 import { loginFormSchema, LoginRequest } from "../../schemas/forms.schemas";
 import authService from "../../service/auth.service";
 import { AxiosError } from "axios";
-import { ZodError } from "zod";
+import { AuthContext, AuthActions } from "../../context/authContext";
 
 const Login: FC = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_, dispatch] = useContext(AuthContext);
+
   const {
     register,
     formState: { errors },
@@ -29,7 +33,15 @@ const Login: FC = () => {
     setLoading(true);
     try {
       const response = await authService.login(data);
-      console.log(response);
+
+      dispatch!({
+        payload: {
+          access_token: response.access_token,
+          refresh_token: response.refresh_token,
+          isLoggedin: true,
+        },
+        type: AuthActions.LOGIN,
+      });
     } catch (error: any) {
       setError(error);
       console.error("hi this is my error baby", error);
@@ -66,7 +78,7 @@ const Login: FC = () => {
           Don't have an account ? <Link to="/register">Register</Link> instead
           😅
         </p>
-        npm install react-hot-toast
+        <Link to="/profile">Go to profile</Link>
       </form>
     </>
   );
