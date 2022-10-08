@@ -1,14 +1,15 @@
-import React, { FC, useContext } from "react";
+import React, { FC } from "react";
+import tokenService from "../../service/token.service";
 
-import { AuthActions, AuthContext } from "../../context/authContext";
+import useStore from "../../store";
 
 const Logout: FC = () => {
-  const [_, dispatch] = useContext(AuthContext);
-  const logout = () => {
-    dispatch!({ type: AuthActions.LOGOUT });
-    console.log("logged out");
+  const { logout } = useStore();
+  const logoutUser = () => {
+    tokenService.clearSavedTokens();
+    logout();
   };
-  return <button onClick={logout}>Logout</button>;
+  return <button onClick={logoutUser}>Logout</button>;
 };
 
 export default Logout;

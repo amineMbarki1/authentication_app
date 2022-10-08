@@ -4,18 +4,18 @@ import axios from "axios";
 import { Paths } from "../config/api.config";
 
 class TokenService {
-  getTokensFromStorage(): LoginResponse | null {
+  getTokensFromStorage(): LoginResponse {
     let tokens = localStorage.getItem("authState");
-    if (!tokens) return null;
+    if (!tokens) throw new Error("No tokens in storage");
     return JSON.parse(tokens);
   }
 
   saveTokensIntoStorage(tokens: LoginResponse) {
-    localStorage.setItem("authState", JSON.stringify(tokens));
+    localStorage.setItem("tokens", JSON.stringify(tokens));
   }
 
-  deleteTokensFromStorage() {
-    localStorage.removeItem("authState");
+  clearSavedTokens() {
+    localStorage.removeItem("tokens");
   }
 
   async validateToken(token: string): Promise<boolean> {

@@ -1,4 +1,4 @@
-// ** All the schemas related form validation
+// ** All the schemas related to form validation
 import zod from "zod";
 
 export const loginFormSchema = zod.object({

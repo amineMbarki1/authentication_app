@@ -1,48 +1,58 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FC, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { FC } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
+import { useMutation } from "react-query";
 
 import {
   registerFormSchema,
   RegisterRequest,
 } from "../../schemas/forms.schemas";
 import authService from "../../service/auth.service";
+import useStore from "../../store";
+import useRedirectIfAuthenticated from "../../shared/hooks/useRedirectIfAuthenticated";
 
 const Register: FC = () => {
+  useRedirectIfAuthenticated();
+  const store = useStore();
   const {
+    reset,
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<RegisterRequest>({ resolver: zodResolver(registerFormSchema) });
 
-  const [error, setError] = useState<any>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const { mutate: registerUser } = useMutation(
+    (userData: RegisterRequest) => authService.register(userData),
+    {
+      onMutate(variables) {
+        store.setRequestLoading(true);
+      },
+      onSuccess() {
+        reset();
+        toast.success("User Created successfully :)");
+        store.setRequestLoading(false);
+      },
+      onError(error: any) {
+        console.log("error baby");
+        store.setRequestLoading(false);
 
-  const onSubmit = async (data: RegisterRequest) => {
-    try {
-      console.log(data);
-
-      setLoading(true);
-      // console.log(data);
-      await authService.register(data);
-      toast.success("Your account has been Created😉 You can login now!");
-    } catch (error) {
-      console.error("hi this is my error", error);
-      setError(error);
-    } finally {
-      setLoading(false);
+        if (error.response.data) {
+          Object.keys(error.response.data).forEach((errorKey) => {
+            toast.error(error.response.data[errorKey]);
+          });
+        } else toast.error(error.message);
+      },
     }
+  );
+
+  const submitHandler: SubmitHandler<RegisterRequest> = (values) => {
+    registerUser(values);
   };
-
-  useEffect(() => {
-    if (error) toast.error(error.message + " 😥");
-  }, [error]);
-
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(submitHandler)}>
         <h4>Register 😅</h4>
         <label htmlFor="firstName">First Name</label>
         <input
@@ -78,7 +88,9 @@ const Register: FC = () => {
         />
         {errors.passwordMatch && <small>{errors.passwordMatch.message}</small>}
         <br />
-        <button type="submit">{loading && "loading ... "}Register</button>
+        <button type="submit">
+          {store.requestLoading ? "Loading" : "Register"}
+        </button>
         <p>
           Already have an account ? <Link to="/login">Login</Link> instead 😅
         </p>

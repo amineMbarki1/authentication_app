@@ -1,58 +1,61 @@
-import { FC, useEffect, useContext } from "react";
-import { useForm } from "react-hook-form";
+import { FC } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useMutation } from "react-query";
 import toast from "react-hot-toast";
-import { ZodError } from "zod";
 
 import { loginFormSchema, LoginRequest } from "../../schemas/forms.schemas";
 import authService from "../../service/auth.service";
-import { AxiosError } from "axios";
-import { AuthContext, AuthActions } from "../../context/authContext";
+import useStore from "../../store";
+import useRedirectIfAuthenticated from "../../shared/hooks/useRedirectIfAuthenticated";
 
 const Login: FC = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_, dispatch] = useContext(AuthContext);
+  useRedirectIfAuthenticated();
+  const location = useLocation();
+  const from: string =
+    location.state?.from === undefined ? "/" : (location.state.from as string);
 
+  const navigate = useNavigate();
+  const store = useStore();
   const {
     register,
     formState: { errors },
     handleSubmit,
   } = useForm<LoginRequest>({ resolver: zodResolver(loginFormSchema) });
 
-  const [loading, setLoading] = useState<boolean>(false);
-  // TODO : Change error type (AxiosError, ZodError)
-  const [error, setError] = useState<AxiosError | ZodError | null>(null);
+  const { mutate: loginUser } = useMutation(
+    (userData: LoginRequest) => authService.login(userData),
+    {
+      onMutate(varibales) {
+        store.setRequestLoading(true);
+      },
+      onSuccess: () => {
+        store.setRequestLoading(false);
+        store.setIsAuthenticated(true);
+        toast.success("You successfully logged in");
+        navigate(from);
+      },
 
-  useEffect(() => {
-    if (error) toast.error(error.message + " 😥");
-  }, [error]);
+      onError(error: any) {
+        store.setRequestLoading(false);
+        console.log(`${error.resposne?.status}`);
 
-  const onSubmit = async (data: LoginRequest) => {
-    setLoading(true);
-    try {
-      const response = await authService.login(data);
-
-      dispatch!({
-        payload: {
-          access_token: response.access_token,
-          refresh_token: response.refresh_token,
-          isLoggedin: true,
-        },
-        type: AuthActions.LOGIN,
-      });
-    } catch (error: any) {
-      setError(error);
-      console.error("hi this is my error baby", error);
-    } finally {
-      setLoading(false);
+        if (`${error.response?.status}`.startsWith("4"))
+          toast.error("Invalid Email or Password");
+        else toast.error(`${error.message}`);
+      },
     }
+  );
+
+  const submitHandler: SubmitHandler<LoginRequest> = (values) => {
+    loginUser(values);
   };
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(submitHandler)}>
         <h4>Login 😅</h4>
         <label htmlFor="email">Email </label>
         <input
@@ -73,7 +76,9 @@ const Login: FC = () => {
         />
         {errors.password && <small>{errors.password.message}</small>}
         <br />
-        <button type="submit">{loading ? "Loding ..." : "Login"}</button>
+        <button type="submit">
+          {store.requestLoading ? "loading ..." : "Login"}
+        </button>
         <p>
           Don't have an account ? <Link to="/register">Register</Link> instead
           😅
