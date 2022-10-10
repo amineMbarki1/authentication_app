@@ -14,7 +14,7 @@ class AuthServiece {
       password,
     });
     const tokens = loginResponseSchema.parse(response.data);
-    tokenService.saveTokensIntoStorage(tokens);
+    tokenService.saveTokens(tokens);
     return tokens;
   }
 

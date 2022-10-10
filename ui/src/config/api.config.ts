@@ -6,6 +6,8 @@ enum Paths {
   LOGIN = "/login",
   REGISTER = "/register",
   PROTECTED = "/protected",
+  CURRENT_USER = "/me",
+  UPDATE_CURRENT_USER = "/me/update",
 }
 
 export const publicRoutes = [Paths.LOGIN, Paths.REGISTER];
@@ -22,9 +24,9 @@ axiosInstance.interceptors.request.use((request) => {
   if (!publicRoutes.includes(request.url as Paths))
     request.headers = {
       ...request.headers,
-      Authorization: `Bearer ${tokenService.getTokensFromStorage()}`,
+      Authorization: `Bearer ${tokenService.getSavedTokens()!.access_token}`,
     };
-  console.log(request.headers);
+  //console.log(request.headers);
   return request;
 });
 

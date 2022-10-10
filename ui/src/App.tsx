@@ -9,6 +9,7 @@ import ProfilePage from "./user/pages/ProfilePage";
 import PrivateRoute from "./shared/components/PrivateRoute";
 
 import "./App.css";
+import EditProfilePage from "./user/pages/EditProfilePage";
 
 function App() {
   const store = useStore();
@@ -36,6 +37,9 @@ function App() {
       {/* ======== */}
       <Route path="/" element={<PrivateRoute />}>
         <Route path="/" element={<ProfilePage />} />
+      </Route>
+      <Route path="/profile/edit" element={<PrivateRoute />}>
+        <Route path="/profile/edit" element={<EditProfilePage />} />
       </Route>
     </Routes>
   );

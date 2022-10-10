@@ -10,12 +10,11 @@ import {
   RegisterRequest,
 } from "../../schemas/forms.schemas";
 import authService from "../../service/auth.service";
-import useStore from "../../store";
 import useRedirectIfAuthenticated from "../../shared/hooks/useRedirectIfAuthenticated";
 
 const Register: FC = () => {
   useRedirectIfAuthenticated();
-  const store = useStore();
+
   const {
     reset,
     register,
@@ -23,20 +22,15 @@ const Register: FC = () => {
     formState: { errors },
   } = useForm<RegisterRequest>({ resolver: zodResolver(registerFormSchema) });
 
-  const { mutate: registerUser } = useMutation(
+  const { mutate: registerUser, isLoading } = useMutation(
     (userData: RegisterRequest) => authService.register(userData),
     {
-      onMutate(variables) {
-        store.setRequestLoading(true);
-      },
       onSuccess() {
         reset();
         toast.success("User Created successfully :)");
-        store.setRequestLoading(false);
       },
       onError(error: any) {
         console.log("error baby");
-        store.setRequestLoading(false);
 
         if (error.response.data) {
           Object.keys(error.response.data).forEach((errorKey) => {
@@ -88,9 +82,7 @@ const Register: FC = () => {
         />
         {errors.passwordMatch && <small>{errors.passwordMatch.message}</small>}
         <br />
-        <button type="submit">
-          {store.requestLoading ? "Loading" : "Register"}
-        </button>
+        <button type="submit">{isLoading ? "Loading ..." : "Register"}</button>
         <p>
           Already have an account ? <Link to="/login">Login</Link> instead 😅
         </p>

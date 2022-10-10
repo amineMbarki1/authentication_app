@@ -25,23 +25,18 @@ const Login: FC = () => {
     handleSubmit,
   } = useForm<LoginRequest>({ resolver: zodResolver(loginFormSchema) });
 
-  const { mutate: loginUser } = useMutation(
+  const { mutate: loginUser, isLoading } = useMutation(
     (userData: LoginRequest) => authService.login(userData),
     {
-      onMutate(varibales) {
-        store.setRequestLoading(true);
-      },
       onSuccess: () => {
-        store.setRequestLoading(false);
+        //store.setRequestLoading(false);
         store.setIsAuthenticated(true);
         toast.success("You successfully logged in");
         navigate(from);
       },
 
       onError(error: any) {
-        store.setRequestLoading(false);
         console.log(`${error.resposne?.status}`);
-
         if (`${error.response?.status}`.startsWith("4"))
           toast.error("Invalid Email or Password");
         else toast.error(`${error.message}`);
@@ -76,9 +71,7 @@ const Login: FC = () => {
         />
         {errors.password && <small>{errors.password.message}</small>}
         <br />
-        <button type="submit">
-          {store.requestLoading ? "loading ..." : "Login"}
-        </button>
+        <button type="submit">{isLoading ? "loading ..." : "Login"}</button>
         <p>
           Don't have an account ? <Link to="/register">Register</Link> instead
           😅

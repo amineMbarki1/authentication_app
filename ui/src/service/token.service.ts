@@ -1,30 +1,21 @@
 import { LoginResponse } from "../schemas/models.schemas";
-import axios from "axios";
-
-import { Paths } from "../config/api.config";
 
 class TokenService {
-  getTokensFromStorage(): LoginResponse {
-    let tokens = localStorage.getItem("authState");
-    if (!tokens) throw new Error("No tokens in storage");
+  // Tokens saved in localstorage under
+  private KEY: string = "tokens";
+
+  saveTokens(tokens: LoginResponse) {
+    localStorage.setItem(this.KEY, JSON.stringify(tokens));
+  }
+
+  getSavedTokens(): LoginResponse | null {
+    const tokens = localStorage.getItem(this.KEY);
+    if (!tokens) return null;
     return JSON.parse(tokens);
   }
 
-  saveTokensIntoStorage(tokens: LoginResponse) {
-    localStorage.setItem("tokens", JSON.stringify(tokens));
-  }
-
   clearSavedTokens() {
-    localStorage.removeItem("tokens");
-  }
-
-  async validateToken(token: string): Promise<boolean> {
-    try {
-      await axios.get(`${Paths.BASE_URL}${Paths.PROTECTED}`);
-      return true;
-    } catch (error) {
-      throw error;
-    }
+    localStorage.removeItem(this.KEY);
   }
 }
 

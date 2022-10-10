@@ -1,17 +1,13 @@
 import create from "zustand";
 
-type UserT = {
-  firstName: string;
-  lastName: string;
-  email: string;
-};
+import { UserDetailsResponse } from "../schemas/models.schemas";
 
 type Store = {
-  authUser: UserT | null;
+  authUser: UserDetailsResponse | null;
   requestLoading: boolean;
   isAuthenticated: boolean;
   initialRequestLoading: boolean;
-  setAuthUser: (user: UserT | null) => void;
+  setAuthUser: (user: UserDetailsResponse | null) => void;
   setRequestLoading: (isLoading: boolean) => void;
   setIsAuthenticated: (isUserAuthenticated: boolean) => void;
   setInitialRequestLoading: (initialLoading: boolean) => void;
