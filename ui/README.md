@@ -1,5 +1,6 @@
 ## Ui for ly authentication app :)
 
-### TODO: Add support for image updoad
+### TODOS:
 
-### TODO: Add support for refresh token
+- TODO: Add support for image updoad
+- TODO: Add support for refresh token
